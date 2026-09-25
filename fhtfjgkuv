@@ -1,0 +1,278 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFL Planer-Edu App Season 2</title>
+<style>
+  :root{
+    --bg1:#0f172a; --bg2:#1e1b4b; --gold:#fbbf24;
+    --grammar1:#6366f1; --grammar2:#a855f7;
+    --vocab1:#10b981; --vocab2:#22d3ee;
+    --reading1:#f97316; --reading2:#facc15;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(99,102,241,.35) 0%, transparent 40%),
+      radial-gradient(circle at 88% 15%, rgba(34,211,238,.30) 0%, transparent 40%),
+      radial-gradient(circle at 50% 95%, rgba(249,115,22,.20) 0%, transparent 45%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    background-attachment:fixed;
+    color:#e2e8f0;
+  }
+  header{ text-align:center; padding:50px 20px 26px; }
+  .logo-wrap{
+    display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;
+  }
+  .logo-wrap img{
+    width:78px; height:78px; border-radius:18px; box-shadow:0 8px 24px rgba(251,191,36,.35);
+  }
+  header h1{
+    margin:0; font-size:2.5rem; font-weight:800; letter-spacing:-0.5px;
+    background:linear-gradient(90deg,#fcd34d,#a5b4fc,#67e8f9);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  header .tagline{
+    margin-top:6px; color:#fcd34d; font-weight:600; font-size:.95rem; letter-spacing:.5px;
+    text-transform:uppercase;
+  }
+  header p{ margin:14px auto 0; max-width:560px; color:#94a3b8; font-size:1.05rem; }
+
+  .grid{
+    max-width:1120px; margin:0 auto; padding:24px 24px 80px;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:30px;
+  }
+  .card{
+    border-radius:22px; padding:2px; position:relative; overflow:hidden; cursor:pointer;
+    transition:transform .28s ease, box-shadow .28s ease;
+    box-shadow:0 14px 34px rgba(0,0,0,.35);
+  }
+  .card:hover{ transform:translateY(-10px) scale(1.015); box-shadow:0 24px 55px rgba(0,0,0,.5); }
+
+  .card.grammar{ background:linear-gradient(135deg,var(--grammar1),var(--grammar2)); }
+  .card.vocab{ background:linear-gradient(135deg,var(--vocab1),var(--vocab2)); }
+  .card.reading{ background:linear-gradient(135deg,var(--reading1),var(--reading2)); }
+
+  .card-inner{
+    background:#0f1425; border-radius:20px; padding:30px 26px 28px; height:100%;
+    position:relative; z-index:1;
+  }
+  .card.grammar .card-inner{ background:linear-gradient(165deg,#161233,#0f1425 70%); }
+  .card.vocab .card-inner{ background:linear-gradient(165deg,#08201c,#0f1425 70%); }
+  .card.reading .card-inner{ background:linear-gradient(165deg,#241405,#0f1425 70%); }
+
+  .glow{
+    position:absolute; width:180px; height:180px; border-radius:50%; filter:blur(60px);
+    opacity:.35; top:-60px; right:-60px; z-index:0;
+  }
+  .card.grammar .glow{ background:var(--grammar2); }
+  .card.vocab .glow{ background:var(--vocab2); }
+  .card.reading .glow{ background:var(--reading2); }
+
+  .icon{
+    width:74px; height:74px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px; position:relative; z-index:1; overflow:hidden;
+    background:#fdfaf3;
+    box-shadow:0 8px 20px rgba(0,0,0,.4);
+  }
+  .icon img{ width:100%; height:100%; object-fit:cover; }
+
+  .card h2{ margin:0 0 8px; font-size:1.4rem; color:#f8fafc; position:relative; z-index:1; }
+  .card p{ margin:0 0 22px; color:#cbd5e1; font-size:.95rem; line-height:1.55; position:relative; z-index:1; }
+
+  .tags{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; position:relative; z-index:1; }
+  .tag{
+    font-size:.72rem; padding:5px 12px; border-radius:999px; font-weight:700; color:#0f1425;
+    background:rgba(255,255,255,.85);
+  }
+  .card.grammar .tag{ background:#c7d2fe; }
+  .card.vocab .tag{ background:#a7f3d0; }
+  .card.reading .tag{ background:#fed7aa; }
+
+  .go{
+    display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:.95rem;
+    padding:11px 20px; border-radius:12px; color:#fff; position:relative; z-index:1;
+    transition:transform .2s ease;
+  }
+  .card.grammar .go{ background:linear-gradient(90deg,var(--grammar1),var(--grammar2)); }
+  .card.vocab .go{ background:linear-gradient(90deg,var(--vocab1),var(--vocab2)); }
+  .card.reading .go{ background:linear-gradient(90deg,var(--reading1),var(--reading2)); }
+  .card:hover .go{ transform:translateX(4px); }
+
+  footer{ text-align:center; padding:26px; color:#64748b; font-size:.85rem; }
+
+  /* Viewer overlay */
+  #viewer{
+    position:fixed; inset:0; background:#0f172a; display:none; flex-direction:column; z-index:999;
+  }
+  #viewer.open{ display:flex; }
+  .viewer-bar{
+    display:flex; align-items:center; gap:14px; padding:10px 18px;
+    background:#111827; border-bottom:1px solid #1f2937;
+  }
+  .back-btn{
+    background:#374151; color:#e5e7eb; border:none; padding:9px 16px; border-radius:10px;
+    font-weight:600; cursor:pointer; font-size:.9rem; display:flex; align-items:center; gap:6px;
+  }
+  .back-btn:hover{ background:#4b5563; }
+  .viewer-title{ color:#f1f5f9; font-weight:700; font-size:1rem; }
+  #viewer iframe{ flex:1; width:100%; border:none; background:#fff; }
+
+  /* Login gate */
+  #loginGate{
+    position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(99,102,241,.35) 0%, transparent 40%),
+      radial-gradient(circle at 88% 15%, rgba(34,211,238,.30) 0%, transparent 40%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    padding:20px;
+  }
+  .login-card{
+    background:#0f1425; border:1px solid rgba(255,255,255,.1); border-radius:22px;
+    padding:38px 34px; max-width:380px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.5);
+    text-align:center;
+  }
+  .login-card img{ width:64px; height:64px; border-radius:14px; margin-bottom:14px; }
+  .login-card h2{ margin:0 0 4px; color:#f8fafc; font-size:1.3rem; }
+  .login-card .sub{ color:#94a3b8; font-size:.85rem; margin-bottom:22px; }
+  .login-card label{ display:block; text-align:left; color:#cbd5e1; font-size:.82rem; font-weight:700; margin:14px 0 6px; }
+  .login-card input{
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid #334155;
+    background:#1e293b; color:#f1f5f9; font-size:.95rem;
+  }
+  .login-card input:focus{ outline:2px solid #818cf8; border-color:#818cf8; }
+  .login-btn{
+    margin-top:22px; width:100%; padding:13px; border:none; border-radius:12px;
+    background:linear-gradient(90deg,#6366f1,#38bdf8); color:#fff; font-weight:800; font-size:1rem;
+    cursor:pointer;
+  }
+  .login-btn:hover{ opacity:.92; }
+  .login-err{ color:#f87171; font-size:.85rem; margin-top:12px; min-height:18px; font-weight:600; }
+  #hubContent{ display:none; }
+</style>
+</head>
+<body>
+
+<div id="loginGate">
+  <div class="login-card">
+    <img 
+src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAECT2NhQlgAAQJPanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANxNqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjU3ZTQ5YzM1LWMwZWMtNDYzYS1iNzUyLTc3NWQ4M2JiZDkwYQAAAAHhanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAABBWp1bWIAAAApanVtZGNib3IAEQAQgAAAqgA4m3EDYzJwYS5hY3Rpb25zLnYyAAAAANRjYm9yoWdhY3Rpb25zgqNmYWN0aW9ubGMycGEuY3JlYXRlZG1zb2Z0d2FyZUFnZW50v2RuYW1lZkdQVC00b/9xZGlnaXRhbFNvdXJjZVR5cGV4Rmh0dHA6Ly9jdi5pcHRjLm9yZy9uZXdzY29kZXMvZGlnaXRhbHNvdXJjZXR5cGUvdHJhaW5lZEFsZ29yaXRobWljTWVkaWGiZmFjdGlvbm5jMnBhLmNvbnZlcnRlZG1zb2Z0d2FyZUFnZW50v2RuYW1lak9wZW5BSSBBUEn/AAAAq2p1bWIAAAAoanVtZGNib3IAEQAQgAAAqgA4m3EDYzJwYS5oYXNoLmRhdGEAAAAAe2Nib3KlamV4Y2x1c2lvbnOBomVzdGFydBghZmxlbmd0aBk3RWRuYW1lbmp1bWJmIG1hbmlmZXN0Y2FsZ2ZzaGEyNTZkaGFzaFggnvgbNZYODafjk2VB8lLcTMRu0sdqjIrsMMtXARb9aVFjcGFkSAAAAAAAAAAAAAAB5mp1bWIAAAAnanVtZGMyY2wAEQAQgAAAqgA4m3EDYzJwYS5jbGFpbS52MgAAAAG3Y2JvcqZqaW5zdGFuY2VJRHgseG1wOmlpZDo0ZGMyMThmZS03MGI0LTRiNTItOTQ3My03NTRiZDZmNGY5N2R0Y2xhaW1fZ2VuZXJhdG9yX2luZm+/ZG5hbWVnQ2hhdEdQVG9vcmcuY2FpLmMycGFfcnNmMC41MS4x/2lzaWduYXR1cmV4TXNlbGYjanVtYmY9L2MycGEvdXJuOmMycGE6NTdlNDljMzUtYzBlYy00NjNhLWI3NTItNzc1ZDgzYmJkOTBhL2MycGEuc2lnbmF0dXJl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" alt="Logo">
+    <h2>Education App</h2>
+    <div class="sub">Please sign in to access your study apps</div>
+    <label for="loginName">Full Name</label>
+    <input type="text" id="loginName" placeholder="student name " autocomplete="name">
+    <label for="loginPass">Password</label>
+    <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+    <button class="login-btn" onclick="attemptLogin()">Enter Study Hub →</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div id="hubContent">
+<header>
+  <div class="logo-wrap">
+ <h1>IFL Planer-Edu App Season 2</h1>
+  </div>
+  <div class="tagline">Your education is our priority!</div>
+  <p>Grammar, Vocabulary &amp; Reading practice — all in one place.</p>
+</header>
+
+<div class="grid">
+  <div class="card grammar" onclick="openApp('grammar','Grammar App')">
+    <div class="glow"></div>
+    <div class="card-inner">
+      <div class="icon"><img 
+src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAIvCAIAAABlVT4NAAAQAElEQVR4Aez9B5BsSXYdCN7r/t6LiJT=" alt="Grammar"></div>
+       <h2>Grammar App</h2>
+      <p>Structured grammar lessons and exercises with instant feedback and explanations.</p>
+      <div class="tags"><span class="tag">Grammar</span><span class="tag">TOEFL / IELTS / IFL</span></div>
+      <div class="go">Open Grammar App →</div>
+    </div>
+  </div>
+
+  <div class="card vocab" onclick="openApp('vocab','Vocabulary App')">
+    <div class="glow"></div>
+    <div class="card-inner">
+      <div class="icon"><img 
+src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAIvCAIAAABlVT4NAAAQAElEQVR4Aez9B4AkyXUeCH8vIjOr2oyf9buzC7cWC2ABEo4AYQgSAGFpIFH0Io8iT9KJPJF3OulOd9JJul=" alt="Vocabulary"></div>
+        <h2>Vocabulary App</h2>
+      <p>15 lessons of vocabulary building, Season 2 — flashcards, quizzes, and review.</p>
+      <div class="tags"><span class="tag">Vocabulary</span><span class="tag">15 Lessons</span></div>
+      <div class="go">Open Vocabulary App →</div>
+    </div>
+  </div>
+
+  <div class="card reading" onclick="openApp('reading','Reading Practice')">
+    <div class="glow"></div>
+    <div class="card-inner">
+      <div class="icon"><img 
+src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAIvCAIAAABlVT4NAAAQAElEQVR4Aez9CZQsSXYdBr5n5u4Rkevf6=" alt="Reading"></div>
+      <h2>Reading Practice</h2>
+      <p>Reading comprehension passages with questions and answer explanations.</p>
+      <div class="tags"><span class="tag">Reading</span><span class="tag">Comprehension</span></div>
+      <div class="go">Open Reading App →</div>
+    </div>
+  </div>
+</div>
+
+<footer>IFL Planer-Edu App Season 2 · combined workspace</footer>
+</div>
+
+<div id="viewer">
+  <div class="viewer-bar">
+    <button class="back-btn" onclick="closeApp()">← Back to Hub</button>
+    <span class="viewer-title" id="viewerTitle"></span>
+  </div>
+  <iframe id="viewerFrame" src=""></iframe>
+</div>
+
+<script>
+const APPS = {
+  grammar: 
+"data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiPgo8dGl0bGU+SUZMIFBsYW5lciDigJQgR3JhbW1hciBBcHA8L3RpdGxlPgo8c3R5bGU+CkBpbXBvcnQgdXJsKCdodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI
+};
+const APP_PASSWORD = "hong5566";
+let CURRENT_STUDENT = "";
+
+function attemptLogin(){
+  const name = document.getElementById('loginName').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  if(!name){ err.textContent = "⚠ Please enter your full name."; return; }
+  if(pass !== APP_PASSWORD){ err.textContent = "⚠ Incorrect password. Please try again."; return; }
+  err.textContent = "";
+  CURRENT_STUDENT = name;
+  try{ sessionStorage.setItem('ifl_student', name); }catch(e){}
+  document.getElementById('loginGate').style.display = 'none';
+  document.getElementById('hubContent').style.display = 'block';
+}
+
+(function(){
+  try{
+    const saved = sessionStorage.getItem('ifl_student');
+    if(saved){
+      CURRENT_STUDENT = saved;
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('hubContent').style.display = 'block';
+    }
+  }catch(e){}
+})();
+
+document.getElementById('loginPass').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') attemptLogin();
+});
+
+function openApp(key, title){
+  document.getElementById('viewerFrame').src = APPS[key];
+  document.getElementById('viewerTitle').textContent = title;
+  document.getElementById('viewer').classList.add('open');
+}
+function closeApp(){
+  document.getElementById('viewer').classList.remove('open');
+  document.getElementById('viewerFrame').src = '';
+}
+</script>
+
+</body>
+</html>
